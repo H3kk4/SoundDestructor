@@ -1,8 +1,24 @@
+from IPython.lib.display import Audio
+# import required module
+from playsound import playsound
 import Utils
-import time
+import matplotlib.pyplot as plt
 
-Fs, data = Utils.load_sound("sounds/guitar_perturbe.wav")
+import Filtres
 
-Utils.play_sound(data, Fs)
+filtres = Filtres.Filtres()
 
-time.sleep(5)
+signal, t = Utils.signal_sin(10)
+
+plt.plot(t, signal)
+plt.xlim(0, 1)
+plt.show()
+
+a,b = filtres.fourier_transform(signal, len(t))
+
+plt.plot(b, a)
+plt.show()
+
+
+
+
