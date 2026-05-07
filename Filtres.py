@@ -7,21 +7,21 @@ class Filtres :
         self.a = []
         self.b = []
 
-    def FT_passe_bas1(self, omega_c:int):
+    def FT_passe_bas1(self, omega_c):
         b = [1] # polynome au numérateur
         a = [1/omega_c, 1] # polynome au dénominateur
         return sig.lti(b, a)
 
-    def FT_passe_haut1(self, omega_c:int):
+    def FT_passe_haut1(self, omega_c):
         b = [1/omega_c,0] # polynome au numérateur
         a = [1/omega_c, 1] # polynome au dénominateur
         return sig.lti(b, a)
 
-    def FT_passe_bas2(self, omega_c:int, ksi:float):
+    def FT_passe_bas2(self, omega_c, ksi:float):
         b = [omega_c**2] # polynome au numérateur
         a = [1, 2*ksi*omega_c, omega_c**2] # polynome au dénominateur
 
-    def FT_passe_haut2(self, omega_c:int, ksi:float):
+    def FT_passe_haut2(self, omega_c, ksi:float):
         b = [1,0,0] # polynome au numérateur
         a = [1, 2*ksi*omega_c, omega_c**2] # polynome au dénominateur
 
