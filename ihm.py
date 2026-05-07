@@ -2,32 +2,9 @@ import sys
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 import pyqtgraph as pg
+from controller import SignalGenerator
 
 buffer_size = 1024
-
-class SignalGenerator(QtCore.QObject):
-    data_ready = QtCore.pyqtSignal(np.ndarray)
-
-    def __init__(self):
-        super().__init__()
-        self.fs = 44100
-        self.frequency = 440  # Hz (note La)
-        self.t = 0
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.generate)
-
-    def start(self):
-        self.timer.start(20)  # toutes les 20 ms
-
-    def stop(self):
-        self.timer.stop()
-
-    def generate(self):
-        t_values = (np.arange(buffer_size) + self.t) / self.fs
-        signal = np.sin(2 * np.pi * self.frequency * t_values)
-
-        self.t += buffer_size
-        self.data_ready.emit(signal)
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -116,7 +93,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Signal
         self.data = np.zeros(buffer_size)
-        self.generator = SignalGenerator()
+        self.generator = SignalGenerator(buffer_size)
         self.generator.data_ready.connect(self.update_plot)
         self.generator.start()
 
