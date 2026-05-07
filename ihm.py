@@ -33,7 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Oscilloscope (signal généré)")
+        self.setWindowTitle("Sound Destroyer")
 
         # Widget central
         central_widget = QtWidgets.QWidget()
@@ -48,22 +48,70 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plot_widget.setYRange(-1, 1)
         self.curve = self.plot_widget.plot(pen='y')
 
-        # Slider (pour fréquence)
-        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.slider.setMinimum(100)
-        self.slider.setMaximum(2000)
-        self.slider.setValue(440)
+
+
+        # Radio button
+        self.rb_sans = QtWidgets.QRadioButton("Sans filtre")
+        self.rb_sans.setChecked(True)
+        self.rb_pb1 = QtWidgets.QRadioButton("Passe bas 1")
+        self.rb_ph1 = QtWidgets.QRadioButton("Passe haut 1")
+        self.rb_pb2 = QtWidgets.QRadioButton("Passe bas 2")
+        self.rb_ph2 = QtWidgets.QRadioButton("Passe haut 2")
+
+        # Sélection filtre
+        self.selection = QtWidgets.QHBoxLayout()
+        self.groupe_rb = QtWidgets.QButtonGroup()
+        self.groupe_rb.addButton(self.rb_sans)
+        self.groupe_rb.addButton(self.rb_pb1)
+        self.groupe_rb.addButton(self.rb_ph1)
+        self.groupe_rb.addButton(self.rb_pb2)
+        self.groupe_rb.addButton(self.rb_ph2)
+        self.groupe_rb.buttonClicked.connect(self.radio_clicked)
+
+        for bouton in self.groupe_rb.buttons():
+            self.selection.addWidget(bouton)
+
+        # Slider Omega C
+        self.omega_c = QtWidgets.QLabel()
+        self.omega_c.setText("Omega C: 100")
+        self.omega_c.hide()
+
+        self.slider_omega_c = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.slider_omega_c.setTickInterval(40)
+        self.slider_omega_c.setTickPosition(QtWidgets.QSlider.TicksAbove)
+        self.slider_omega_c.setMinimum(20)
+        self.slider_omega_c.setMaximum(2000)
+        self.slider_omega_c.setValue(100)
+        self.slider_omega_c.hide()
+
+        # Slider KSI
+        self.ksi = QtWidgets.QLabel()
+        self.ksi.setText("KSI: 0.5")
+        self.ksi.hide()
+
+        self.slider_ksi = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.slider_ksi.setTickInterval(50)
+        self.slider_ksi.setTickPosition(QtWidgets.QSlider.TicksAbove)
+        self.slider_ksi.setMinimum(1)
+        self.slider_ksi.setMaximum(1000)
+        self.slider_ksi.setValue(500)
+        self.slider_ksi.hide()
 
         # Bouton
         self.button = QtWidgets.QPushButton("Pause")
 
         # Ajout dans le layout
         layout.addWidget(self.plot_widget)
-        layout.addWidget(self.slider)
+        layout.addLayout(self.selection)
+        layout.addWidget(self.omega_c)
+        layout.addWidget(self.slider_omega_c)
+        layout.addWidget(self.ksi)
+        layout.addWidget(self.slider_ksi)
         layout.addWidget(self.button)
 
         # Connexions
-        self.slider.valueChanged.connect(self.change_frequency)
+        self.slider_omega_c.valueChanged.connect(self.change_omega_c)
+        self.slider_ksi.valueChanged.connect(self.change_ksi)
         self.button.clicked.connect(self.toggle)
 
         # Signal
@@ -74,16 +122,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.running = True
 
-        # Radio button
-        self.rb_sans = QtWidgets.QRadioButton("Sans filtre")
-        self.rb_sans.setChecked(True)
-        self.rb_avec = QtWidgets.QRadioButton("Avec filtre") #TODO
-
-        # Sélection filtre
-        self.groupe_rb = QtWidgets.QButtonGroup()
-        self.groupe_rb.addButton(self.rb_sans)
-        self.groupe_rb.addButton(self.rb_avec)
-
     def update_plot(self, new_data):
         self.data = new_data
         self.curve.setData(self.data)
@@ -92,8 +130,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.generator.stop()
         event.accept()
 
-    def change_frequency(self, value):
+    def change_omega_c(self, value):
         self.generator.frequency = value
+        self.omega_c.setText(f"Omega C: {value}")
+
+    def change_ksi(self, value):
+        self.ksi.setText(f"KSI: {value * 0.001}")
 
     def toggle(self):
         if self.running:
@@ -103,6 +145,42 @@ class MainWindow(QtWidgets.QMainWindow):
             self.generator.start()
             self.button.setText("Pause")
         self.running = not self.running
+
+    def radio_clicked(self, button):
+
+        match button.text():
+            case "Sans filtre":
+                self.omega_c.hide()
+                self.ksi.hide()
+                self.slider_omega_c.hide()
+                self.slider_ksi.hide()
+
+            case "Passe bas 1":
+                self.omega_c.show()
+                self.ksi.hide()
+                self.slider_omega_c.show()
+                self.slider_ksi.hide()
+
+            case "Passe bas 2":
+                self.omega_c.show()
+                self.ksi.show()
+                self.slider_omega_c.show()
+                self.slider_ksi.show()
+
+            case "Passe haut 1":
+                self.omega_c.show()
+                self.ksi.hide()
+                self.slider_omega_c.show()
+                self.slider_ksi.hide()
+
+            case "Passe haut 2":
+                self.omega_c.show()
+                self.ksi.show()
+                self.slider_omega_c.show()
+                self.slider_ksi.show()
+
+            case _:
+                raise ValueError("Unknown filter: {}".format(button))
 
 
 if __name__ == "__main__":
