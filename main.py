@@ -1,14 +1,14 @@
 from IPython.lib.display import Audio
 # import required module
 from playsound import playsound
-import Utils
+import player
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import wave
 import pyaudio as pya
 
-import Filtres
+import filtres
 
 filtres = Filtres.Filtres()
 
