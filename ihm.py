@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 import pyqtgraph as pg
-from controller import SignalGenerator
+from controller import Controller
 
 buffer_size = 1024
 
@@ -93,9 +93,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Signal
         self.data = np.zeros(buffer_size)
-        self.generator = SignalGenerator(buffer_size)
-        self.generator.data_ready.connect(self.update_plot)
-        self.generator.start()
+        self.controller = Controller(buffer_size)
+        self.controller.data_ready.connect(self.update_plot)
+        self.controller.start()
 
         self.running = True
 
@@ -104,22 +104,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curve.setData(self.data)
 
     def close_event(self, event):
-        self.generator.stop()
+        self.controller.stop()
         event.accept()
 
     def change_omega_c(self, value):
-        self.generator.frequency = value
+        self.controller.omega_c = value
         self.omega_c.setText(f"Omega C: {value}")
 
     def change_ksi(self, value):
         self.ksi.setText(f"KSI: {value * 0.001}")
+        self.controller.ksi = value
 
     def toggle(self):
         if self.running:
-            self.generator.stop()
+            self.controller.stop()
             self.button.setText("Reprendre")
         else:
-            self.generator.start()
+            self.controller.start()
             self.button.setText("Pause")
         self.running = not self.running
 
@@ -131,30 +132,36 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ksi.hide()
                 self.slider_omega_c.hide()
                 self.slider_ksi.hide()
+                self.controller.fonction = None
 
             case "Passe bas 1":
                 self.omega_c.show()
                 self.ksi.hide()
                 self.slider_omega_c.show()
                 self.slider_ksi.hide()
+                self.controller.fonction = "P1"
+
 
             case "Passe bas 2":
                 self.omega_c.show()
                 self.ksi.show()
                 self.slider_omega_c.show()
                 self.slider_ksi.show()
+                self.controller.fonction = "P2"
 
             case "Passe haut 1":
                 self.omega_c.show()
                 self.ksi.hide()
                 self.slider_omega_c.show()
                 self.slider_ksi.hide()
+                self.controller.fonction = "H1"
 
             case "Passe haut 2":
                 self.omega_c.show()
                 self.ksi.show()
                 self.slider_omega_c.show()
                 self.slider_ksi.show()
+                self.controller.fonction = "H2"
 
             case _:
                 raise ValueError("Unknown filter: {}".format(button))
