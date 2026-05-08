@@ -4,3 +4,5 @@ pyqtgraph
 
 IPython
 scipy
+
+pyaudio
