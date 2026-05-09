@@ -5,4 +5,4 @@ pyqtgraph
 IPython
 scipy
 
-pyaudio
+sounddevice

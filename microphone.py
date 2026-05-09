@@ -2,7 +2,7 @@ import sounddevice as sd
 import numpy as np
 from PyQt5.QtCore import QObject, pyqtSignal
 
-class AudioInput(QObject):
+class Microphone(QObject):
 
     new_data = pyqtSignal(np.ndarray)
 
