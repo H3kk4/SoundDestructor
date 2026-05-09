@@ -1,8 +1,10 @@
-import Utils
-import time
+import ihm
+import sys
+from PyQt5 import QtWidgets
 
-Fs, data = Utils.load_sound("sounds/guitar_perturbe.wav")
 
-Utils.play_sound(data, Fs)
-
-time.sleep(5)
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    win = ihm.MainWindow()
+    win.show()
+    sys.exit(app.exec_())
