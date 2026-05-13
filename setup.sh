@@ -10,6 +10,8 @@ else
 fi
 
 source .venv/bin/activate
+sudo chown -R "$USER":"$USER" .venv
+
 pip install -r requirement.txt
 
 # Bibliothèque tiers
